@@ -1,0 +1,117 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Nunito", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #111a53;
+  background-color: #f2f2f2;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.input {
+  @apply w-full border px-3 py-2 rounded mb-2;
+}
+
+.btn {
+  @apply text-white px-4 py-2 rounded;
+}
+
+.btn-sm {
+  @apply bg-gray-300 text-black px-2 py-1 text-sm rounded hover:bg-gray-400;
+}
+a {
+  font-weight: 500;
+  color: #243d44;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #032832;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  background: #e5e4e4;
+}
+button:focus,
+button:focus-visible {
+  background: #e5e4e4;
+  box-shadow: 0px 0px 3px 0px rgb(0 0 0 / 59%);
+}
+.text-logo-800 {
+  color: #243d44 !important;
+}
+.text-logo-500 {
+  color: #243d44 !important;
+}
+.text-logo-400 {
+  color: #243d44 !important;
+}
+.bg-logo {
+  background-color: #243d44 !important;
+}
+.border_logo {
+  border-color: #243d44 !important;
+}
+.rounded-full {
+  border-radius: calc(infinity * 1px) !important;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #243d44;
+    background-color: #f2f2f2;
+  }
+  a:hover {
+    color: #33454b;
+  }
+  button {
+    background-color: #ffffff;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #243d44;
+    background-color: #f2f2f2;
+  }
+  a:hover {
+    color: #33454b;
+  }
+  button {
+    background-color: #ffffff;
+  }
+}
