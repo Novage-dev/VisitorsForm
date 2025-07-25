@@ -59,7 +59,8 @@ export default function VisitorTable() {
                         }}
                       />
                     ) : null,
-                  width: 50,
+                  width: 80,
+                  minWidth: 80,
                 };
               }
 
