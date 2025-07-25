@@ -30,41 +30,52 @@ export default function VisitorTable() {
     } else {
       setRowData(data);
       if (data.length > 0) {
-        const columns = Object.keys(data[0]).map((key) => {
-          if (key === "image") {
-            return {
-              field: key,
-              headerName: "Photo",
-              cellRenderer: (params) =>
-                params.value ? (
-                  <img
-                    src={params.value}
-                    alt="visitor"
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      borderRadius: "4px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : null,
-              width: 80,
-              pinned: "left",
-              suppressMovable: true,
-            };
-          }
+        const columns = [
+  {
+    headerName: "#",
+    valueGetter: "node.rowIndex + 1",
+    width: 60,
+    pinned: "left",
+    suppressMovable: true,
+  },
+  ...Object.keys(data[0])
+    .filter((key) => key !== "id") // 👈 exclude 'id'
+    .map((key) => {
+      if (key === "image") {
+        return {
+          field: key,
+          headerName: "Photo",
+          cellRenderer: (params) =>
+            params.value ? (
+              <img
+                src={params.value}
+                alt="visitor"
+                style={{
+                  width: "75px",
+                  height: "75px",
+                  borderRadius: "50%",
+                  objectFit: "contain",
+                }}
+              />
+            ) : null,
+          width: 80,
+          pinned: "left",
+        };
+      }
 
-          return {
-            field: key,
-            headerName: key
-              .replace(/_/g, " ")
-              .replace(/\b\w/g, (c) => c.toUpperCase()),
-            sortable: true,
-            filter: true,
-            minWidth: 120,
-            flex: 1,
-          };
-        });
+      return {
+        field: key,
+        headerName: key
+          .replace(/_/g, " ")
+          .replace(/\b\w/g, (c) => c.toUpperCase()),
+        sortable: true,
+        filter: true,
+        minWidth: 120,
+        flex: 1,
+      };
+    }),
+];
+
 
         setColDefs(columns);
       }
