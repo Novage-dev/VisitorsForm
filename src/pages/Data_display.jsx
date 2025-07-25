@@ -20,10 +20,9 @@ export default function VisitorTable() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const [exportStatus, setExportStatus] = useState("idle");
 
-  // ✅ 1️⃣ Fetch data
+  // ✅ Fetch data from Supabase
   const fetchVisitors = async () => {
     const { data, error } = await supabase.from("newVisitors").select("*");
     if (error) {
@@ -37,19 +36,42 @@ export default function VisitorTable() {
               field: key,
               headerName: "Photo",
               cellRenderer: (params) =>
-                params.value
-                  ? `<img src="${params.value}" alt="visitor" style="width: 50px; height: 50px; border-radius: 4px; object-fit: cover;" />`
-                  : "",
+                params.value ? (
+                  <img
+                    src={params.value}
+                    alt="visitor"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      borderRadius: "4px",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : null,
+              width: 80,
+              pinned: "left",
+              suppressMovable: true,
             };
           }
-          return { field: key, sortable: true, filter: true };
+
+          return {
+            field: key,
+            headerName: key
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (c) => c.toUpperCase()),
+            sortable: true,
+            filter: true,
+            minWidth: 120,
+            flex: 1,
+          };
         });
+
         setColDefs(columns);
       }
     }
   };
 
-  // ✅ 2️⃣ Export to Excel (Windows + Phone only)
+  // ✅ Export to Excel (Windows + Mobile only)
   const exportToExcel = async () => {
     const isWindows = navigator.platform.includes("Win");
     const isMobile = /Mobi|Android/i.test(navigator.userAgent);
@@ -99,7 +121,7 @@ export default function VisitorTable() {
     });
   };
 
-  // ✅ 3️⃣ Auth
+  // ✅ Admin login with password
   const handleLogin = () => {
     if (password === import.meta.env.VITE_ADMIN_PASSWORD) {
       setAuthenticated(true);
@@ -109,7 +131,7 @@ export default function VisitorTable() {
     }
   };
 
-  // ✅ 4️⃣ Summary stats
+  // ✅ Summary stats
   const summary = useMemo(() => {
     const total = rowData.length;
     const male = rowData.filter((v) => v.gender?.toLowerCase() === "m").length;
@@ -143,7 +165,7 @@ export default function VisitorTable() {
         <SummaryCard label="Female Visitors" value={summary.female} />
       </div>
 
-      {/* Data Grid */}
+      {/* AG Grid Table */}
       <div
         className="rounded-xl border border-gray-200 overflow-hidden shadow"
         style={{ height: 500 }}
@@ -152,7 +174,13 @@ export default function VisitorTable() {
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            defaultColDef={{ flex: 1 }}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true,
+              minWidth: 120,
+              flex: 1,
+            }}
             pagination={true}
             theme={themeQuartz}
           />
@@ -165,10 +193,7 @@ export default function VisitorTable() {
           className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50"
           style={{ backgroundColor: "rgba(0, 0, 0, 0.5)", padding: "2rem" }}
         >
-          <div
-            className="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm text-center space-y-4"
-            style={{ borderRadius: "20px" }}
-          >
+          <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm text-center space-y-4">
             <h2 className="text-xl font-semibold text-gray-800">
               Admin Access Required
             </h2>
@@ -177,7 +202,7 @@ export default function VisitorTable() {
               className="w-full max-w-sm space-y-4 mb-5"
               onSubmit={(e) => {
                 e.preventDefault();
-                handleRegister();
+                handleLogin();
               }}
             >
               <PasswordField
@@ -189,10 +214,10 @@ export default function VisitorTable() {
                 setShow={setShowPassword}
               />
             </form>
+
             <button
               onClick={handleLogin}
-              className="w-full bg-logo text-white py-2 rounded-md hover:bg-indigo-700 transition"
-              style={{ borderRadius: "calc(infinity * 1px)" }}
+              className="w-full bg-logo text-white py-2 rounded-full hover:bg-indigo-700 transition"
             >
               Enter
             </button>
@@ -203,7 +228,7 @@ export default function VisitorTable() {
   );
 }
 
-// ✅ SummaryCard component reused
+// ✅ SummaryCard component
 function SummaryCard({ label, value }) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 text-center transition hover:shadow-md">
@@ -213,7 +238,7 @@ function SummaryCard({ label, value }) {
   );
 }
 
-// ✅ Reusable Password Field
+// ✅ Reusable password field with visibility toggle
 const PasswordField = ({
   name,
   value,
