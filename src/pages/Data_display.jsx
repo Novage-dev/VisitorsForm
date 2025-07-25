@@ -7,7 +7,6 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
-import "ag-grid-community/styles/ag-grid.css";
 import {
   LockClosedIcon,
   EyeIcon,
