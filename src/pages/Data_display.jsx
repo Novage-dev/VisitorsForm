@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ModuleRegistry, themeQuartz } from "ag-grid-community";
+import {
+  AllCommunityModule,
+  ModuleRegistry,
+  themeQuartz,
+} from "ag-grid-community";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
@@ -30,51 +34,58 @@ export default function VisitorTable() {
       setRowData(data);
       if (data.length > 0) {
         const columns = [
-  {
-    headerName: "#",
-    valueGetter: "node.rowIndex + 1",
-    width: 60,
-    pinned: "left",
-    suppressMovable: true,
-  },
-  ...Object.keys(data[0])
-    .filter((key) => key !== "id") // 👈 exclude 'id'
-    .map((key) => {
-      if (key === "image") {
-        return {
-          field: key,
-          headerName: "Photo",
-          cellRenderer: (params) =>
-            params.value ? (
-              <img
-                src={params.value}
-                alt="visitor"
-                style={{
-                  width: "45px",
-                  height: "45px",
-                  borderRadius: "50%",
-                  objectFit: "contain",
-                }}
-              />
-            ) : null,
-          width: 80,
-          pinned: "left",
-        };
-      }
+          {
+            headerName: "#",
+            valueGetter: "node.rowIndex + 1",
+            width: 40,
+            suppressMovable: true,
+          },
+          ...Object.keys(data[0])
+            .filter((key) => key !== "id")
+            .map((key) => {
+              if (key === "image") {
+                return {
+                  field: key,
+                  headerName: "Photo",
+                  cellRenderer: (params) =>
+                    params.value ? (
+                      <img
+                        src={params.value}
+                        alt="visitor"
+                        style={{
+                          width: "45px",
+                          height: "45px",
+                          borderRadius: "50%",
+                          objectFit: "contain",
+                        }}
+                      />
+                    ) : null,
+                  width: 50,
+                };
+              }
 
-      return {
-        field: key,
-        headerName: key
-          .replace(/_/g, " ")
-          .replace(/\b\w/g, (c) => c.toUpperCase()),
-        sortable: true,
-        filter: true,
-        minWidth: 120,
-        flex: 1,
-      };
-    }),
-];
+              // Estimate minWidth based on longest content
+              const maxContentLength = data.reduce((max, row) => {
+                const value = row[key] ?? "";
+                const stringLength = String(value).length;
+                return Math.max(max, stringLength);
+              }, 0);
 
+              const estimatedMinWidth = maxContentLength * 8 + 10;
+              const finalMinWidth = Math.max(estimatedMinWidth, 120);
+
+              return {
+                field: key,
+                headerName: key
+                  .replace(/_/g, " ")
+                  .replace(/\b\w/g, (c) => c.toUpperCase()),
+                sortable: true,
+                filter: true,
+                minWidth: finalMinWidth,
+                flex: 1,
+              };
+            }),
+        ];
 
         setColDefs(columns);
       }
