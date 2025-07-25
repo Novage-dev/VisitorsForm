@@ -3,13 +3,11 @@ import { AgGridReact } from "ag-grid-react";
 import {
   AllCommunityModule,
   ModuleRegistry,
-  themeQuartz,
 } from "ag-grid-community";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
 import "ag-grid-community/styles/ag-grid.css";
-import { themeQuartz } from '@ag-grid-community/theming';
 import {
   LockClosedIcon,
   EyeIcon,
@@ -204,7 +202,6 @@ export default function VisitorTable() {
               flex: 1,
             }}
             pagination={true}
-            theme={themeQuartz}
             rowHeight={50}
           />
         </div>
