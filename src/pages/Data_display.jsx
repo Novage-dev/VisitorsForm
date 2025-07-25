@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
 import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 import {
   LockClosedIcon,
   EyeIcon,
@@ -199,7 +200,6 @@ export default function VisitorTable() {
               resizable: true,
               sortable: true,
               filter: true,
-              minWidth: 120,
               flex: 1,
             }}
             pagination={true}
