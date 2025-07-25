@@ -9,7 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
+import { themeQuartz } from '@ag-grid-community/theming';
 import {
   LockClosedIcon,
   EyeIcon,
@@ -192,7 +192,7 @@ export default function VisitorTable() {
         className="rounded-xl border border-gray-200 overflow-hidden shadow"
         style={{ height: 500 }}
       >
-        <div className="ag-theme-quartz h-full w-full">
+        <div className="h-full w-full">
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
@@ -200,6 +200,7 @@ export default function VisitorTable() {
               resizable: true,
               sortable: true,
               filter: true,
+              minWidth: 50,
               flex: 1,
             }}
             pagination={true}
