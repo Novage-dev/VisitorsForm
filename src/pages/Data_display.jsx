@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { AllCommunityModule, ModuleRegistry, themeQuartz } from "ag-grid-community";
 import toast, { Toaster } from "react-hot-toast";
 import { supabase } from "#/supabase";
 import * as XLSX from "xlsx";
 import "ag-grid-community/styles/ag-grid.css";
-import { themeQuartz } from "ag-grid-community";
 import {
   LockClosedIcon,
   EyeIcon,
@@ -51,8 +50,8 @@ export default function VisitorTable() {
                 src={params.value}
                 alt="visitor"
                 style={{
-                  width: "75px",
-                  height: "75px",
+                  width: "45px",
+                  height: "45px",
                   borderRadius: "50%",
                   objectFit: "contain",
                 }}
@@ -194,6 +193,7 @@ export default function VisitorTable() {
             }}
             pagination={true}
             theme={themeQuartz}
+            rowHeight={50}
           />
         </div>
       </div>
