@@ -10,7 +10,7 @@ import {
   EyeSlashIcon,
   PencilIcon,
   TrashIcon,
-  CheckIcon
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -101,18 +101,21 @@ export default function VisitorTable() {
       columns.push({
         headerName: "Actions",
         field: "actions",
-        minWidth: 130,
+        maxWidth: 80,
+        minWidth: 60,
+        width: 60,
         pinned: "left",
         filter: false,
         sortable: false,
         cellRenderer: (params) => (
           <button
             onClick={() => handleDeleteRow(params.data.id)}
-            className="bg-red-500 text-white px-2 py-1 text-sm rounded hover:bg-red-600 transition"
+            title="Delete Visitor"
+            className="bg-red-500 text-white px-2 py-1 text-sm hover:bg-red-600 transition"
             style={{
               borderRadius: "50% !important",
-              width: 50,
-              height: 50,
+              width: "45px !important",
+              height: "45px !important",
               background: "#dd4646",
               fontWeight: "bold",
               display: "flex",
@@ -140,9 +143,11 @@ export default function VisitorTable() {
 
   const summary = useMemo(() => {
     const total = rowData.length;
-    const male = rowData.filter((v) => v.gender?.toLowerCase() === "m").length;
+    const male = rowData.filter(
+      (v) => v.gender?.toLowerCase() === "male"
+    ).length;
     const female = rowData.filter(
-      (v) => v.gender?.toLowerCase() === "f"
+      (v) => v.gender?.toLowerCase() === "female"
     ).length;
     return { total, male, female };
   }, [rowData]);
@@ -197,17 +202,6 @@ export default function VisitorTable() {
     }
   };
 
-  const onCellEditRequest = useCallback((params) => {
-    const id = params.data.id;
-    setUpdatedRows((prev) => ({
-      ...prev,
-      [id]: {
-        ...(prev[id] || {}),
-        [params.colDef.field]: params.newValue,
-      },
-    }));
-  }, []);
-
   const handleSaveChanges = async () => {
     const confirm = window.confirm("Apply all changes?");
     if (!confirm) return;
@@ -232,6 +226,10 @@ export default function VisitorTable() {
     if (!newMode) setUpdatedRows({});
     generateColDefs(rowData);
   };
+
+  useEffect(() => {
+    generateColDefs(rowData);
+  }, [editMode, rowData]);
 
   return (
     <div className="space-y-8 relative">
@@ -266,10 +264,19 @@ export default function VisitorTable() {
             minWidth: 50,
             flex: 1,
           }}
-          editType="fullRow"
+          editType="fullRow" // or "cell" if you prefer single-cell editing
           rowHeight={50}
           pagination
-          onCellEditRequest={onCellEditRequest}
+          onCellValueChanged={(params) => {
+            const id = params.data.id;
+            setUpdatedRows((prev) => ({
+              ...prev,
+              [id]: {
+                ...(prev[id] || {}),
+                [params.colDef.field]: params.newValue,
+              },
+            }));
+          }}
         />
       </div>
 
