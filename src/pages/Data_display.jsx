@@ -13,8 +13,6 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -112,6 +110,7 @@ export default function VisitorTable() {
           <button
             onClick={() => handleDeleteRow(params.data.id)}
             className="bg-red-500 text-white px-2 py-1 text-sm rounded hover:bg-red-600 transition"
+            style={{ background: "#dd4646", fontWeight: "bold",}}
           >
             Delete
           </button>
@@ -259,7 +258,7 @@ export default function VisitorTable() {
             minWidth: 50,
             flex: 1,
           }}
-          editType="cell"
+          editType="fullRows"
           rowHeight={50}
           pagination
           onCellEditRequest={onCellEditRequest}
@@ -279,7 +278,7 @@ export default function VisitorTable() {
                     borderRadius: "50% !important",
                     width: 50,
                     height: 50,
-                    background: "#dd4646",
+                    background: "#243d44",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -288,7 +287,7 @@ export default function VisitorTable() {
                     borderRadius: "50% !important",
                     width: 50,
                     height: 50,
-                    background: "#243d44",
+                    background: "#dd4646",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
