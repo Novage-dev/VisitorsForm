@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import {
+  ModuleRegistry,
+  ClientSideRowModelModule,
+  MenuModule,
+  ColumnsToolPanelModule,
+  ExcelExportModule,
+} from "ag-grid-community";
 import { supabase } from "#/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import * as XLSX from "xlsx";
@@ -13,8 +19,12 @@ import {
   CheckIcon,
 } from "@heroicons/react/24/outline";
 
-
-ModuleRegistry.registerModules([AllCommunityModule]);
+ModuleRegistry.registerModules([
+  ClientSideRowModelModule,
+  MenuModule,
+  ColumnsToolPanelModule,
+  ExcelExportModule,
+]);
 
 export default function VisitorTable() {
   const [rowData, setRowData] = useState([]);
@@ -110,7 +120,7 @@ export default function VisitorTable() {
           <button
             onClick={() => handleDeleteRow(params.data.id)}
             className="bg-red-500 text-white px-2 py-1 text-sm rounded hover:bg-red-600 transition"
-            style={{ background: "#dd4646", fontWeight: "bold",}}
+            style={{ background: "#dd4646", fontWeight: "bold" }}
           >
             Delete
           </button>
@@ -258,7 +268,7 @@ export default function VisitorTable() {
             minWidth: 50,
             flex: 1,
           }}
-          editType="fullRows"
+          editType="fullRow"
           rowHeight={50}
           pagination
           onCellEditRequest={onCellEditRequest}
@@ -266,7 +276,10 @@ export default function VisitorTable() {
       </div>
 
       {authenticated && (
-        <div className="fixed right-6 space-y-4 z-50 bottom-20" style={{bottom: "75px !important"}}>
+        <div
+          className="fixed right-6 space-y-4 z-50 bottom-20"
+          style={{ bottom: "75px !important" }}
+        >
           <button
             onClick={toggleEditMode}
             className={`p-3 rounded-full shadow-lg ${
@@ -278,7 +291,7 @@ export default function VisitorTable() {
                     borderRadius: "50% !important",
                     width: 50,
                     height: 50,
-                    background: "#243d44",
+                    background: "#dd4646",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -287,7 +300,7 @@ export default function VisitorTable() {
                     borderRadius: "50% !important",
                     width: 50,
                     height: 50,
-                    background: "#dd4646",
+                    background: "#243d44",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
