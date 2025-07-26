@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
-import {
-  ModuleRegistry,
-  ClientSideRowModelModule,
-  MenuModule,
-  ColumnsToolPanelModule,
-  ExcelExportModule,
-} from "ag-grid-community";
 import { supabase } from "#/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import * as XLSX from "xlsx";
@@ -18,13 +11,6 @@ import {
   TrashIcon,
   CheckIcon,
 } from "@heroicons/react/24/outline";
-
-ModuleRegistry.registerModules([
-  ClientSideRowModelModule,
-  MenuModule,
-  ColumnsToolPanelModule,
-  ExcelExportModule,
-]);
 
 export default function VisitorTable() {
   const [rowData, setRowData] = useState([]);
