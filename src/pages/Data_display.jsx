@@ -10,8 +10,7 @@ import {
   EyeSlashIcon,
   PencilIcon,
   TrashIcon,
-  CheckIcon,
-  TrashIcon,
+  CheckIcon
 } from "@heroicons/react/24/outline";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
