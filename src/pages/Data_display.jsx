@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
+import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
 import { supabase } from "#/supabase";
 import toast, { Toaster } from "react-hot-toast";
 import * as XLSX from "xlsx";
@@ -10,7 +11,10 @@ import {
   PencilIcon,
   TrashIcon,
   CheckIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 export default function VisitorTable() {
   const [rowData, setRowData] = useState([]);
@@ -106,9 +110,18 @@ export default function VisitorTable() {
           <button
             onClick={() => handleDeleteRow(params.data.id)}
             className="bg-red-500 text-white px-2 py-1 text-sm rounded hover:bg-red-600 transition"
-            style={{ background: "#dd4646", fontWeight: "bold" }}
+            style={{
+              borderRadius: "50% !important",
+              width: 50,
+              height: 50,
+              background: "#dd4646",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            Delete
+            <TrashIcon className="w-6 h-6" />
           </button>
         ),
       });
