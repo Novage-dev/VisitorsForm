@@ -24,7 +24,6 @@ export default function VisitorTable() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [exportStatus, setExportStatus] = useState("idle");
   const [editMode, setEditMode] = useState(false);
   const [updatedRows, setUpdatedRows] = useState({});
 
@@ -38,6 +37,19 @@ export default function VisitorTable() {
     }
   };
 
+  const formatDate = (value) => {
+    if (!value) return "";
+    try {
+      return new Date(value).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    } catch {
+      return value;
+    }
+  };
+
   const generateColDefs = (data) => {
     if (!data.length) return;
     const columns = [
@@ -46,6 +58,8 @@ export default function VisitorTable() {
         valueGetter: "node.rowIndex + 1",
         width: 40,
         suppressMovable: true,
+        filter: false,
+        sortable: false,
       },
       ...Object.keys(data[0])
         .filter((key) => key !== "id")
@@ -54,6 +68,8 @@ export default function VisitorTable() {
             return {
               field: key,
               headerName: "Photo",
+              filter: false,
+              sortable: false,
               cellRenderer: (params) =>
                 params.value ? (
                   <img
@@ -72,16 +88,13 @@ export default function VisitorTable() {
             };
           }
 
-          const maxLength = data.reduce((max, row) => {
-            const value = row[key] ?? "";
-            return Math.max(max, String(value).length);
-          }, 0);
-
           return {
             field: key,
-            headerName: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+            headerName: key
+              .replace(/_/g, " ")
+              .replace(/\b\w/g, (c) => c.toUpperCase()),
             editable: editMode && key !== "image",
-            minWidth: Math.max(120, maxLength * 8 + 10),
+            minWidth: 120,
             flex: 1,
           };
         }),
@@ -91,7 +104,10 @@ export default function VisitorTable() {
       columns.push({
         headerName: "Actions",
         field: "actions",
-        width: 100,
+        minWidth: 130,
+        pinned: "left",
+        filter: false,
+        sortable: false,
         cellRenderer: (params) => (
           <button
             onClick={() => handleDeleteRow(params.data.id)}
@@ -118,34 +134,40 @@ export default function VisitorTable() {
   const summary = useMemo(() => {
     const total = rowData.length;
     const male = rowData.filter((v) => v.gender?.toLowerCase() === "m").length;
-    const female = rowData.filter((v) => v.gender?.toLowerCase() === "f").length;
+    const female = rowData.filter(
+      (v) => v.gender?.toLowerCase() === "f"
+    ).length;
     return { total, male, female };
   }, [rowData]);
 
   const exportToExcel = async () => {
-    const isWindows = navigator.platform.includes("Win");
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-
-    if (!isWindows && !isMobile) {
-      toast.error("Excel export is only available on Windows or mobile.");
-      return;
-    }
-
-    const formatted = rowData.map((v) => ({
-      Name: v.full_name,
-      Phone: v.primary_phone_num,
-      Address: v.address,
-      Gender: v.gender,
-      Age: v.age,
-      "Inviter Name": v.iow_name,
-      "Inviter Phone": v.iow_phone_num,
-      "Follow Up Leader": v.follow_up_leader,
-      "Foundation Status": v.foundation_class_status,
-      "Ministers Status": v.ministers_training_status,
-      "Ministry Joined": v.ministry_joined,
-      "Cell Group Status": v.cell_group_status,
-      Registered: v.registered_at,
-    }));
+    const includeImage = window.confirm("Include image URL in the export?");
+    const formatted = rowData.map((v) => {
+      const base = {
+        Name: v.full_name,
+        "Primary phone": v.primary_phone_num,
+        "Secondary phone": v.secondary_phone_num,
+        Address: v.address,
+        Gender: v.gender,
+        Age: v.age,
+        "Born again date": formatDate(v.born_again_date),
+        "Inviter Name": v.iow_name,
+        "Inviter Phone": v.iow_phone_num,
+        "Follow Up Leader": v.follow_up_leader,
+        "Foundation Status": v.foundation_class_status,
+        "Foundation Class teacher": v.foundation_class_teacher,
+        "Ministers Status": v.ministers_training_status,
+        "Ministers Teacher": v.ministers_training_teacher,
+        "Ministry Joined": v.ministry_joined,
+        "Cell Group Status": v.cell_group_status,
+        "Assigned Cell Group": v.assigned_cell_group,
+        Registered: formatDate(v.registered_at),
+      };
+      if (includeImage) {
+        base["Photo URL"] = v.image || "";
+      }
+      return base;
+    });
 
     const ws = XLSX.utils.json_to_sheet(formatted);
     const wb = XLSX.utils.book_new();
@@ -154,7 +176,9 @@ export default function VisitorTable() {
   };
 
   const handleDeleteRow = async (id) => {
-    const confirm = window.confirm("Are you sure you want to delete this visitor?");
+    const confirm = window.confirm(
+      "Are you sure you want to delete this visitor?"
+    );
     if (!confirm) return;
 
     const { error } = await supabase.from("newVisitors").delete().eq("id", id);
@@ -209,10 +233,9 @@ export default function VisitorTable() {
         <h2 className="text-2xl font-bold text-gray-800">Visitors Dashboard</h2>
         <button
           onClick={exportToExcel}
-          disabled={exportStatus === "loading"}
-          className="px-4 py-2 rounded-lg bg-amber-200 text-logo-800 font-semibold shadow hover:bg-amber-300 transition disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-amber-200 text-logo-800 font-semibold shadow hover:bg-amber-300 transition"
         >
-          {exportStatus === "loading" ? "Exporting..." : "Download Excel"}
+          Download Excel
         </button>
       </div>
 
@@ -222,7 +245,10 @@ export default function VisitorTable() {
         <SummaryCard label="Female Visitors" value={summary.female} />
       </div>
 
-      <div className="rounded-xl border border-gray-200 overflow-hidden shadow ag-theme-alpine" style={{ height: 500 }}>
+      <div
+        className="rounded-xl border border-gray-200 overflow-hidden shadow ag-theme-alpine"
+        style={{ height: 500 }}
+      >
         <AgGridReact
           rowData={rowData}
           columnDefs={colDefs}
@@ -233,21 +259,41 @@ export default function VisitorTable() {
             minWidth: 50,
             flex: 1,
           }}
-          editType="fullRow"
+          editType="cell"
           rowHeight={50}
           pagination
           onCellEditRequest={onCellEditRequest}
         />
       </div>
 
-      {/* Floating Buttons */}
       {authenticated && (
-        <div className="fixed bottom-6 right-6 space-y-4 z-50">
+        <div className="fixed right-6 space-y-4 z-50 bottom-20" style={{bottom: "75px !important"}}>
           <button
             onClick={toggleEditMode}
             className={`p-3 rounded-full shadow-lg ${
               editMode ? "bg-yellow-500" : "bg-indigo-600"
             } text-white hover:opacity-90 transition`}
+            style={
+              editMode
+                ? {
+                    borderRadius: "50% !important",
+                    width: 50,
+                    height: 50,
+                    background: "#dd4646",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }
+                : {
+                    borderRadius: "50% !important",
+                    width: 50,
+                    height: 50,
+                    background: "#243d44",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }
+            }
             title="Toggle Edit Mode"
           >
             <PencilIcon className="h-6 w-6" />
@@ -258,6 +304,9 @@ export default function VisitorTable() {
               onClick={handleSaveChanges}
               className="p-3 rounded-full shadow-lg bg-green-600 text-white hover:bg-green-700 transition"
               title="Save Changes"
+              style={{
+                background: "#46dd73ff",
+              }}
             >
               <CheckIcon className="h-6 w-6" />
             </button>
@@ -265,13 +314,14 @@ export default function VisitorTable() {
         </div>
       )}
 
-      {/* Password Modal */}
       {!authenticated && (
         <div className="fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 bg-black/50">
           <div className="bg-white p-8 rounded-xl shadow-xl w-full max-w-sm text-center space-y-4">
-            <h2 className="text-xl font-semibold text-gray-800">Admin Access Required</h2>
+            <h2 className="text-xl font-semibold text-gray-800">
+              Admin Access Required
+            </h2>
             <form
-              className="w-full max-w-sm space-y-4 mb-5"
+              className="space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleLogin();
@@ -285,13 +335,13 @@ export default function VisitorTable() {
                 show={showPassword}
                 setShow={setShowPassword}
               />
+              <button
+                type="submit"
+                className="w-full bg-logo text-white py-2 rounded-full hover:bg-indigo-700 transition"
+              >
+                Enter
+              </button>
             </form>
-            <button
-              onClick={handleLogin}
-              className="w-full bg-logo text-white py-2 rounded-full hover:bg-indigo-700 transition"
-            >
-              Enter
-            </button>
           </div>
         </div>
       )}
@@ -308,7 +358,14 @@ function SummaryCard({ label, value }) {
   );
 }
 
-const PasswordField = ({ name, value, onChange, placeholder, show, setShow }) => {
+const PasswordField = ({
+  name,
+  value,
+  onChange,
+  placeholder,
+  show,
+  setShow,
+}) => {
   const Icon = show ? EyeSlashIcon : EyeIcon;
   return (
     <div className="relative">
